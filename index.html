@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ozzy Wizzpop Earnings</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Earnings">
+<meta name="theme-color" content="#FFD23F">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Work+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ====== Paste your Apps Script web app URL into API_URL further down ====== */
+  :root {
+    --yellow: #FFD23F;
+    --navy: #1C1B40;
+    --pink: #FF4F7B;
+    --teal: #2A9D8F;
+    --cream: #FFF9EE;
+    --muted: #5B5A7A;
+    --chunky: "Bagel Fat One", "Arial Black", Impact, sans-serif;
+    --body: "Work Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--yellow); color: var(--navy); }
+  body {
+    font-family: var(--body);
+    -webkit-font-smoothing: antialiased;
+    padding: calc(env(safe-area-inset-top, 0px) + 20px) 18px calc(env(safe-area-inset-bottom, 0px) + 40px);
+  }
+  .wrap { max-width: 560px; margin: 0 auto; }
+
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  h1 { font-family: var(--chunky); font-weight: 400; font-size: clamp(34px, 10vw, 48px); line-height: .95; margin: 0; }
+  h1 span { display: block; }
+  .btn {
+    font: 700 16px var(--body); color: var(--navy); background: var(--cream);
+    border: 3px solid var(--navy); border-radius: 999px; padding: 10px 18px;
+    box-shadow: 4px 4px 0 var(--navy); cursor: pointer;
+  }
+  .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--navy); }
+  .btn.spin { opacity: .6; }
+
+  .tabs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px;
+    background: var(--cream); border: 3px solid var(--navy); border-radius: 999px;
+    box-shadow: 5px 5px 0 var(--navy); margin-bottom: 26px;
+  }
+  .tabs button {
+    font: 700 17px var(--body); color: var(--navy); background: none; border: 0;
+    border-radius: 999px; padding: 11px 0; cursor: pointer;
+  }
+  .tabs button.on { background: var(--pink); color: var(--cream); }
+
+  .card {
+    position: relative; background: var(--cream); border: 4px solid var(--navy);
+    border-radius: 24px; box-shadow: 8px 8px 0 var(--navy);
+    padding: 22px 24px; margin-bottom: 24px;
+  }
+  /* ticket notches */
+  .card.ticket::before, .card.ticket::after {
+    content: ""; position: absolute; top: 50%; width: 26px; height: 26px; margin-top: -13px;
+    background: var(--yellow); border: 4px solid var(--navy); border-radius: 50%;
+  }
+  .card.ticket::before { left: -17px; }
+  .card.ticket::after { right: -17px; }
+
+  .label { font-weight: 700; font-size: 19px; margin: 0 0 4px; }
+  .big { font-family: var(--chunky); font-size: clamp(72px, 24vw, 128px); line-height: 1; color: var(--pink); margin: 6px 0 4px; letter-spacing: -1px; }
+  .mid { font-family: var(--chunky); font-size: 38px; line-height: 1; }
+  .sub { font-size: 17px; margin: 6px 0 0; }
+
+  .row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .month-name { font-weight: 700; font-size: 20px; margin: 0; }
+  .meta { color: var(--muted); font-size: 15px; margin-top: 8px; }
+
+  .bar { display: flex; height: 18px; border: 3px solid var(--navy); border-radius: 999px; overflow: hidden; background: var(--cream); margin-top: 12px; }
+  .bar i { display: block; height: 100%; }
+  .bar .d { background: var(--teal); }
+  .bar .u { background: var(--pink); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 15px; margin-top: 10px; }
+  .legend b::before { content: ""; display: inline-block; width: 11px; height: 11px; border: 2px solid var(--navy); border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+  .legend .d::before { background: var(--teal); }
+  .legend .u::before { background: var(--pink); }
+  .legend b { font-weight: 500; }
+
+  .toggle { background: none; border: 0; padding: 0; margin-top: 14px; font: 700 15px var(--body); color: var(--navy); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+  .gigs { list-style: none; margin: 16px 0 0; padding: 0; border-top: 3px dashed var(--navy); }
+  .gigs li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; border-bottom: 2px solid rgba(28,27,64,.12); }
+  .gigs li:last-child { border-bottom: 0; }
+  .g-title { font-weight: 700; font-size: 16px; }
+  .g-info { color: var(--muted); font-size: 14px; grid-column: 1; }
+  .g-amt { font-family: var(--chunky); font-size: 22px; grid-row: 1 / span 2; grid-column: 2; align-self: center; }
+  .g-amt.none { font-family: var(--body); font-size: 14px; color: var(--muted); }
+  .done .g-title::after { content: " ✓"; color: var(--teal); }
+
+  .year { font-family: var(--chunky); font-size: 34px; margin: 6px 0 14px; display: flex; justify-content: space-between; align-items: baseline; }
+  .year small { font-family: var(--chunky); font-size: 24px; color: var(--teal); }
+
+  .more { display: block; width: 100%; margin: 4px 0 26px; }
+  .note { text-align: center; font-size: 14px; color: var(--navy); opacity: .75; margin-top: 8px; }
+  .msg { font-size: 17px; line-height: 1.45; }
+  input[type=password] {
+    width: 100%; font: 500 18px var(--body); padding: 12px 14px; margin: 14px 0;
+    border: 3px solid var(--navy); border-radius: 14px; background: #fff; color: var(--navy);
+  }
+  .hide { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Ozzy</span><span>Wizzpop</span></h1>
+    <button class="btn" id="refresh">Refresh</button>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button data-tab="upcoming" class="on">Upcoming</button>
+    <button data-tab="archive">Archive</button>
+  </div>
+
+  <main id="main"><div class="card"><p class="msg">Loading your gigs…</p></div></main>
+  <p class="note" id="updated"></p>
+</div>
+
+<script>
+  // ====== SETTINGS ======
+  const API_URL = 'PASTE_YOUR_WEB_APP_URL_HERE'; // the Apps Script link ending in /exec
+  // ======================
+
+  const KEY_STORE = 'ow_key';
+  const DATA_STORE = 'ow_data';
+  const state = { data: null, tab: 'upcoming', further: false, open: {} };
+  const main = document.getElementById('main');
+
+  function store(k, v) { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+  function recall(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  function money(n) {
+    return new Intl.NumberFormat('en-GB', {
+      style: 'currency', currency: 'GBP',
+      minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2
+    }).format(n || 0);
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function gigWord(n) { return n === 0 ? 'No gigs' : n === 1 ? '1 gig' : n + ' gigs'; }
+
+  function bar(m, max) {
+    const scale = max > 0 ? 100 / max : 0;
+    return '<div class="bar"><i class="d" style="width:' + (m.done * scale) + '%"></i>' +
+           '<i class="u" style="width:' + (m.upcoming * scale) + '%"></i></div>';
+  }
+
+  function gigList(m) {
+    if (!m.gigs.length) return '';
+    return '<ul class="gigs">' + m.gigs.map(g =>
+      '<li class="' + (g.done ? 'done' : '') + '">' +
+        '<span class="g-title">' + esc(g.title) + '</span>' +
+        '<span class="g-amt' + (g.amount === null ? ' none' : '') + '">' + (g.amount === null ? 'no £' : money(g.amount)) + '</span>' +
+        '<span class="g-info">' + esc(g.date) + ' · ' + esc(g.time) + (g.location ? ' · ' + esc(g.location) : '') + '</span>' +
+      '</li>').join('') + '</ul>';
+  }
+
+  function toggleBtn(m) {
+    if (!m.gigs.length) return '';
+    const open = state.open[m.key];
+    return '<button class="toggle" data-month="' + m.key + '">' + (open ? 'Hide gigs' : 'Show gigs') + '</button>' +
+           (open ? gigList(m) : '');
+  }
+
+  function monthCard(m, max) {
+    return '<div class="card">' +
+      '<div class="row"><p class="month-name">' + esc(m.label) + '</p><span class="mid">' + money(m.total) + '</span></div>' +
+      bar(m, max) +
+      '<p class="meta">' + gigWord(m.count) +
+        (m.done && m.upcoming ? ' · ' + money(m.done) + ' done, ' + money(m.upcoming) + ' to come' : '') + '</p>' +
+      toggleBtn(m) +
+    '</div>';
+  }
+
+  function heroCard(m) {
+    return '<div class="card ticket">' +
+      '<p class="label">' + esc(m.label.split(' ')[0]) + ' so far &amp; to come</p>' +
+      '<div class="big">' + money(m.total) + '</div>' +
+      '<div class="legend"><b class="d">' + money(m.done) + ' done</b><b class="u">' + money(m.upcoming) + ' to come</b></div>' +
+      bar(m, m.total) +
+      '<p class="sub">' + gigWord(m.count) + ' this month.</p>' +
+      toggleBtn(m) +
+    '</div>';
+  }
+
+  function render() {
+    const d = state.data;
+    if (!d) return;
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === state.tab));
+    document.getElementById('updated').textContent = 'Updated ' + d.updated;
+
+    const idx = Math.max(0, d.months.findIndex(m => m.key === d.currentKey));
+    let html = '';
+
+    if (state.tab === 'upcoming') {
+      const now = d.months[idx];
+      const next = d.months.slice(idx + 1, idx + d.upcomingMonths);
+      const further = d.months.slice(idx + d.upcomingMonths);
+      const shown = state.further ? next.concat(further) : next;
+      const max = Math.max(1, ...shown.map(m => m.total));
+      const ahead = next.reduce((s, m) => s + m.total, 0);
+
+      html += heroCard(now);
+      if (next.length) {
+        html += '<div class="card"><p class="label">Next ' + next.length + ' months</p>' +
+                '<div class="big" style="color:var(--teal);font-size:clamp(56px,17vw,88px)">' + money(ahead) + '</div>' +
+                '<p class="sub">booked so far</p></div>';
+      }
+      html += shown.map(m => monthCard(m, max)).join('');
+      if (further.length) {
+        html += '<button class="btn more" id="further">' + (state.further ? 'Show less' : 'Show further ahead') + '</button>';
+      }
+    } else {
+      const past = d.months.slice(0, idx).reverse();
+      if (!past.length) {
+        html = '<div class="card"><p class="msg">Nothing in the archive yet.</p></div>';
+      } else {
+        const max = Math.max(1, ...past.map(m => m.total));
+        const years = {};
+        past.forEach(m => { (years[m.year] = years[m.year] || []).push(m); });
+        Object.keys(years).sort().reverse().forEach(y => {
+          const tot = years[y].reduce((s, m) => s + m.total, 0);
+          html += '<div class="year">' + y + ' <small>' + money(tot) + '</small></div>';
+          html += years[y].map(m => monthCard(m, max)).join('');
+        });
+      }
+    }
+    main.innerHTML = html;
+  }
+
+  function askKey(message) {
+    document.getElementById('updated').textContent = '';
+    main.innerHTML =
+      '<div class="card ticket"><p class="label">Enter your passcode</p>' +
+      '<p class="msg">' + (message || 'You only need to do this once on each device.') + '</p>' +
+      '<input type="password" id="key" autocomplete="current-password" placeholder="Passcode">' +
+      '<button class="btn" id="saveKey">Unlock</button></div>';
+    const input = document.getElementById('key');
+    const go = () => { if (input.value.trim()) { store(KEY_STORE, input.value.trim()); load(); } };
+    document.getElementById('saveKey').onclick = go;
+    input.onkeydown = e => { if (e.key === 'Enter') go(); };
+    input.focus();
+  }
+
+  function showError(text) {
+    if (state.data) {
+      document.getElementById('updated').textContent = 'Couldn’t refresh — showing last saved figures. (' + text + ')';
+    } else {
+      main.innerHTML = '<div class="card"><p class="label">Something went wrong</p><p class="msg">' + esc(text) + '</p></div>';
+    }
+  }
+
+  async function load() {
+    const key = recall(KEY_STORE);
+    if (!key) return askKey();
+    if (API_URL.indexOf('http') !== 0) return showError('Paste your Apps Script /exec link into API_URL in index.html.');
+    const btn = document.getElementById('refresh');
+    btn.classList.add('spin'); btn.textContent = 'Loading…';
+    try {
+      const res = await fetch(API_URL + '?key=' + encodeURIComponent(key) + '&t=' + Date.now());
+      const json = await res.json();
+      if (json.error === 'bad key') { store(KEY_STORE, null); return askKey('That passcode didn’t match. Try again.'); }
+      if (json.error) throw new Error(json.error);
+      state.data = json;
+      store(DATA_STORE, JSON.stringify(json));
+      render();
+    } catch (e) {
+      showError(e.message || 'Couldn’t reach Google.');
+    } finally {
+      btn.classList.remove('spin'); btn.textContent = 'Refresh';
+    }
+  }
+
+  document.getElementById('tabs').onclick = e => {
+    const t = e.target.closest('button'); if (!t) return;
+    state.tab = t.dataset.tab; render(); window.scrollTo(0, 0);
+  };
+  main.onclick = e => {
+    const t = e.target.closest('.toggle');
+    if (t) { state.open[t.dataset.month] = !state.open[t.dataset.month]; render(); return; }
+    if (e.target.id === 'further') { state.further = !state.further; render(); }
+  };
+  document.getElementById('refresh').onclick = load;
+
+  // show last saved figures instantly, then fetch fresh ones
+  try { const cached = JSON.parse(recall(DATA_STORE)); if (cached && cached.months) { state.data = cached; render(); } } catch (e) {}
+  load();
+</script>
+</body>
+</html>
