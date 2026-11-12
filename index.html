@@ -106,10 +106,6 @@
   .more { display: block; width: 100%; margin: 4px 0 26px; }
   .note { text-align: center; font-size: 14px; color: var(--navy); opacity: .75; margin-top: 8px; }
   .msg { font-size: 17px; line-height: 1.45; }
-  input[type=password] {
-    width: 100%; font: 500 18px var(--body); padding: 12px 14px; margin: 14px 0;
-    border: 3px solid var(--navy); border-radius: 14px; background: #fff; color: var(--navy);
-  }
   .hide { display: none !important; }
 </style>
 </head>
@@ -134,7 +130,6 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbwxKZmTckGE6cByyuA3xLDsDaaVa0HA_k8OZiut-FgSQn-JwioOjS0EwQ2WshdwyLUaJQ/exec'; // the Apps Script link ending in /exec
   // ======================
 
-  const KEY_STORE = 'ow_key';
   const DATA_STORE = 'ow_data';
   const state = { data: null, tab: 'upcoming', further: false, open: {} };
   const main = document.getElementById('main');
@@ -242,20 +237,6 @@
     main.innerHTML = html;
   }
 
-  function askKey(message) {
-    document.getElementById('updated').textContent = '';
-    main.innerHTML =
-      '<div class="card ticket"><p class="label">Enter your passcode</p>' +
-      '<p class="msg">' + (message || 'You only need to do this once on each device.') + '</p>' +
-      '<input type="password" id="key" autocomplete="current-password" placeholder="Passcode">' +
-      '<button class="btn" id="saveKey">Unlock</button></div>';
-    const input = document.getElementById('key');
-    const go = () => { if (input.value.trim()) { store(KEY_STORE, input.value.trim()); load(); } };
-    document.getElementById('saveKey').onclick = go;
-    input.onkeydown = e => { if (e.key === 'Enter') go(); };
-    input.focus();
-  }
-
   function showError(text) {
     if (state.data) {
       document.getElementById('updated').textContent = 'Couldn’t refresh — showing last saved figures. (' + text + ')';
@@ -265,15 +246,12 @@
   }
 
   async function load() {
-    const key = recall(KEY_STORE);
-    if (!key) return askKey();
     if (API_URL.indexOf('http') !== 0) return showError('Paste your Apps Script /exec link into API_URL in index.html.');
     const btn = document.getElementById('refresh');
     btn.classList.add('spin'); btn.textContent = 'Loading…';
     try {
-      const res = await fetch(API_URL + '?key=' + encodeURIComponent(key) + '&t=' + Date.now());
+      const res = await fetch(API_URL + '?t=' + Date.now());
       const json = await res.json();
-      if (json.error === 'bad key') { store(KEY_STORE, null); return askKey('That passcode didn’t match. Try again.'); }
       if (json.error) throw new Error(json.error);
       state.data = json;
       store(DATA_STORE, JSON.stringify(json));
