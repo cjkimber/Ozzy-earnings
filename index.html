@@ -176,14 +176,14 @@
       '<div class="row"><p class="month-name">' + esc(m.label) + '</p><span class="mid">' + money(m.total) + '</span></div>' +
       bar(m, max) +
       '<p class="meta">' + gigWord(m.count) +
-        (m.done && m.upcoming ? ' · ' + money(m.done) + ' done, ' + money(m.upcoming) + ' to come' : '') + '</p>' +
+        (m.done && m.upcoming ? ' · ' + money(m.done) + ' earned, ' + money(m.upcoming) + ' to come' : '') + '</p>' +
       toggleBtn(m) +
     '</div>';
   }
 
   function heroCard(m) {
     return '<div class="card ticket">' +
-      '<p class="label">' + esc(m.label.split(' ')[0]) + ' so far &amp; to come</p>' +
+      '<p class="label">' + esc(m.label.split(' ')[0]) + ' total earnings</p>' +
       '<div class="big">' + money(m.total) + '</div>' +
       '<div class="legend"><b class="d">' + money(m.done) + ' done</b><b class="u">' + money(m.upcoming) + ' to come</b></div>' +
       bar(m, m.total) +
@@ -280,3 +280,4 @@
 </script>
 </body>
 </html>
+
