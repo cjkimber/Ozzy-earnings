@@ -101,6 +101,12 @@
   .done .g-title::after { content: " ✓"; color: var(--teal); }
 
   .year { font-family: var(--chunky); font-weight: 800; font-size: 30px; letter-spacing: -0.03em; margin: 6px 0 14px; display: flex; justify-content: space-between; align-items: baseline; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .pair > div { display: flex; flex-direction: column; gap: 6px; }
+  .pair .k { font-size: 14px; font-weight: 600; color: var(--muted); }
+  .pair .tot { color: var(--pink); }
+  .year-card { padding: 18px 24px; }
+  .year-card .pair { margin-top: 0; }
   .year small { font-family: var(--chunky); font-weight: 800; font-size: 22px; color: var(--teal); }
 
   .more { display: block; width: 100%; margin: 4px 0 26px; }
@@ -181,6 +187,23 @@
     '</div>';
   }
 
+  function pair(gigs, total) {
+    return '<div class="pair">' +
+      '<div><span class="k">Gig earnings</span><span class="mid">' + money(gigs) + '</span></div>' +
+      '<div><span class="k">Total earnings</span><span class="mid tot">' + money(total) + '</span></div>' +
+    '</div>';
+  }
+
+  function archiveCard(m, max) {
+    return '<div class="card">' +
+      '<p class="month-name">' + esc(m.label) + '</p>' +
+      pair(m.total, m.total + (m.wage || 0)) +
+      bar(m, max) +
+      '<p class="meta">' + gigWord(m.count) + '</p>' +
+      toggleBtn(m) +
+    '</div>';
+  }
+
   function heroCard(m) {
     return '<div class="card ticket">' +
       '<p class="label">' + esc(m.label.split(' ')[0]) + ' total earnings</p>' +
@@ -207,14 +230,8 @@
       const further = d.months.slice(idx + d.upcomingMonths);
       const shown = state.further ? next.concat(further) : next;
       const max = Math.max(1, ...shown.map(m => m.total));
-      const ahead = next.reduce((s, m) => s + m.total, 0);
 
       html += heroCard(now);
-      if (next.length) {
-        html += '<div class="card"><p class="label">Next ' + next.length + ' months</p>' +
-                '<div class="big" style="color:var(--teal);font-size:clamp(56px,17vw,88px)">' + money(ahead) + '</div>' +
-                '<p class="sub">booked so far</p></div>';
-      }
       html += shown.map(m => monthCard(m, max)).join('');
       if (further.length) {
         html += '<button class="btn more" id="further">' + (state.further ? 'Show less' : 'Show further ahead') + '</button>';
@@ -228,9 +245,11 @@
         const years = {};
         past.forEach(m => { (years[m.year] = years[m.year] || []).push(m); });
         Object.keys(years).sort().reverse().forEach(y => {
-          const tot = years[y].reduce((s, m) => s + m.total, 0);
-          html += '<div class="year">' + y + ' <small>' + money(tot) + '</small></div>';
-          html += years[y].map(m => monthCard(m, max)).join('');
+          const gigs = years[y].reduce((s, m) => s + m.total, 0);
+          const all = years[y].reduce((s, m) => s + m.total + (m.wage || 0), 0);
+          html += '<div class="year">' + y + '</div>';
+          html += '<div class="card year-card">' + pair(gigs, all) + '</div>';
+          html += years[y].map(m => archiveCard(m, max)).join('');
         });
       }
     }
