@@ -106,6 +106,8 @@
   .pair .k { font-size: 14px; font-weight: 600; color: var(--muted); }
   .pair .tot { color: var(--pink); }
   .year-card { padding: 18px 24px; }
+  .gig-row { margin-top: 18px; padding-top: 16px; border-top: 2px solid rgba(28,27,64,.12); align-items: center; }
+  .gig-row .k { font-size: 16px; font-weight: 700; }
   .year-card .pair { margin-top: 0; }
   .year small { font-family: var(--chunky); font-weight: 800; font-size: 22px; color: var(--teal); }
 
@@ -207,7 +209,9 @@
   function heroCard(m) {
     return '<div class="card ticket">' +
       '<p class="label">' + esc(m.label.split(' ')[0]) + ' total earnings</p>' +
-      '<div class="big">' + money(m.total) + '</div>' +
+      '<div class="big">' + money(m.total + (m.wage || 0)) + '</div>' +
+      '<p class="sub">' + (m.wage ? 'Gigs plus Cora wage' : 'Cora wage not added yet') + '</p>' +
+      '<div class="row gig-row"><span class="k">Gig earnings</span><span class="mid">' + money(m.total) + '</span></div>' +
       '<div class="legend"><b class="d">' + money(m.done) + ' done</b><b class="u">' + money(m.upcoming) + ' to come</b></div>' +
       bar(m, m.total) +
       '<p class="sub">' + gigWord(m.count) + ' this month.</p>' +
